@@ -37,9 +37,9 @@ public class RagQueryServiceImpl implements RagQueryService {
         List<Document> relevantDocuments = vectorStore.similaritySearch(searchRequest);
 
         // Build chat client with QuestionAnswerAdvisor
+        // FIX APPLIED: vectorStore is passed directly to the builder constructor
         ChatClient chatClient = chatClientBuilder
-                .defaultAdvisors(QuestionAnswerAdvisor.builder()
-                        .vectorStore(vectorStore)
+                .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(searchRequest)
                         .build())
                 .build();
