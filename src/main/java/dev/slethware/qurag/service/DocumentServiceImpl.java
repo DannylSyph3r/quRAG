@@ -63,21 +63,7 @@ public class DocumentServiceImpl implements DocumentService {
             TextSplitter textSplitter = new TokenTextSplitter();
             List<org.springframework.ai.document.Document> chunks = textSplitter.apply(documents);
 
-            // Add document metadata to each chunk
-            String documentId = UUID.randomUUID().toString();
-            for (int i = 0; i < chunks.size(); i++) {
-                org.springframework.ai.document.Document chunk = chunks.get(i);
-                chunk.getMetadata().put("document_id", documentId);
-                chunk.getMetadata().put("chunk_index", i);
-                chunk.getMetadata().put("filename", originalFilename);
-            }
-
-            // Store chunks in vector store
-            vectorStore.add(chunks);
-
-            // Save document metadata to database
             Document document = Document.builder()
-                    .id(UUID.fromString(documentId))
                     .filename(filename)
                     .originalFilename(originalFilename)
                     .s3Url(s3Url)
@@ -87,6 +73,16 @@ public class DocumentServiceImpl implements DocumentService {
                     .build();
 
             documentRepository.save(document);
+
+            String documentId = document.getId().toString();
+            for (int i = 0; i < chunks.size(); i++) {
+                org.springframework.ai.document.Document chunk = chunks.get(i);
+                chunk.getMetadata().put("document_id", documentId);
+                chunk.getMetadata().put("chunk_index", i);
+                chunk.getMetadata().put("filename", originalFilename);
+            }
+
+            vectorStore.add(chunks);
 
             log.info("Document uploaded successfully: {} with {} chunks", originalFilename, chunks.size());
 
