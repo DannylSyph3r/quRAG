@@ -4,15 +4,14 @@ import dev.slethware.qurag.dto.response.ApiResponse;
 import dev.slethware.qurag.dto.response.DocumentDetailResponse;
 import dev.slethware.qurag.dto.response.DocumentResponse;
 import dev.slethware.qurag.service.DocumentService;
+import dev.slethware.qurag.service.S3Service;
 import dev.slethware.qurag.utility.ApiResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +25,7 @@ import java.util.UUID;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final S3Service s3Service;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
@@ -87,5 +87,32 @@ public class DocumentController {
                 ApiResponseUtil.successFull("Document details retrieved successfully", response),
                 HttpStatus.OK
         );
+    }
+
+    @GetMapping("/{id}/download")
+    @Operation(
+            summary = "Download original document",
+            description = "Downloads the original uploaded document from S3 storage"
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Document downloaded successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Document not found")
+    })
+    public ResponseEntity<byte[]> downloadDocument(
+            @Parameter(description = "Document ID", required = true)
+            @PathVariable UUID id) {
+
+        DocumentResponse document = documentService.getDocumentMetadata(id);
+        byte[] fileBytes = s3Service.downloadFile(document.getFilename());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(document.getFileType()));
+        headers.setContentDisposition(
+                ContentDisposition.builder("attachment")
+                        .filename(document.getOriginalFilename())
+                        .build()
+        );
+
+        return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
     }
 }

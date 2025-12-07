@@ -11,4 +11,5 @@ public interface DocumentService {
     DocumentResponse uploadDocument(MultipartFile file);
     List<DocumentResponse> getAllDocuments();
     DocumentDetailResponse getDocumentById(UUID documentId);
+    DocumentResponse getDocumentMetadata(UUID documentId);
 }

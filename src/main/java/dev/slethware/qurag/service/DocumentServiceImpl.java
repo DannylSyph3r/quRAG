@@ -168,6 +168,14 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
+    @Override
+    public DocumentResponse getDocumentMetadata(UUID documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+
+        return mapToDocumentResponse(document);
+    }
+
     private DocumentResponse mapToDocumentResponse(Document document) {
         return DocumentResponse.builder()
                 .id(document.getId())
