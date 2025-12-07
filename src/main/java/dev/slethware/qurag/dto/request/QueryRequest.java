@@ -19,5 +19,5 @@ public class QueryRequest {
     private Integer topK = 5;
 
     @Builder.Default
-    private Double similarityThreshold = 0.7;
+    private Double similarityThreshold = 0.3;
 }

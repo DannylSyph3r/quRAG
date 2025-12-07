@@ -45,6 +45,9 @@ public class RagQueryServiceImpl implements RagQueryService {
 
         // Get answer from LLM with context
         String answer = chatClient.prompt()
+                .system("You are a helpful assistant. Provide concise, direct answers. " +
+                        "Avoid lengthy lists unless specifically requested. " +
+                        "Summarize key points clearly and briefly.")
                 .user(request.getQuestion())
                 .call()
                 .content();
