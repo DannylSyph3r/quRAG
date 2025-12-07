@@ -7,9 +7,11 @@ import dev.slethware.qurag.service.DocumentService;
 import dev.slethware.qurag.utility.ApiResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +27,7 @@ public class DocumentController {
 
     private final DocumentService documentService;
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "Upload a document",
             description = "Uploads a document (PDF, DOCX, or TXT), extracts text using Tika, chunks the content, generates embeddings via Google Gemini, and stores them in Pinecone vector database. The original file is stored in S3."
@@ -36,7 +38,8 @@ public class DocumentController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Failed to process document")
     })
     public ResponseEntity<ApiResponse<DocumentResponse>> uploadDocument(
-            @Parameter(description = "Document file (PDF, DOCX, or TXT, max 200MB)", required = true)
+            @Parameter(description = "Document file (PDF, DOCX, or TXT, max 200MB)", required = true,
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
             @RequestParam("file") MultipartFile file) {
 
         DocumentResponse response = documentService.uploadDocument(file);
