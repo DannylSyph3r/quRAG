@@ -82,6 +82,8 @@ public class DocumentServiceImpl implements DocumentService {
                 chunk.getMetadata().put("filename", originalFilename);
             }
 
+            log.info("About to store {} chunks in Pinecone vector store", chunks.size());
+
             vectorStore.add(chunks);
 
             log.info("Document uploaded successfully: {} with {} chunks", originalFilename, chunks.size());

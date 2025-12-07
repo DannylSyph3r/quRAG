@@ -37,7 +37,6 @@ public class RagQueryServiceImpl implements RagQueryService {
         List<Document> relevantDocuments = vectorStore.similaritySearch(searchRequest);
 
         // Build chat client with QuestionAnswerAdvisor
-        // FIX APPLIED: vectorStore is passed directly to the builder constructor
         ChatClient chatClient = chatClientBuilder
                 .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(searchRequest)
@@ -61,7 +60,7 @@ public class RagQueryServiceImpl implements RagQueryService {
                                 ? doc.getMetadata().get("document_id").toString()
                                 : null)
                         .chunkIndex(doc.getMetadata().get("chunk_index") != null
-                                ? Integer.parseInt(doc.getMetadata().get("chunk_index").toString())
+                                ? parseChunkIndex(doc.getMetadata().get("chunk_index"))  // FIXED
                                 : null)
                         .build())
                 .collect(Collectors.toList());
@@ -73,5 +72,19 @@ public class RagQueryServiceImpl implements RagQueryService {
                 .chunksUsed(chunksUsed)
                 .totalChunks(chunksUsed.size())
                 .build();
+    }
+
+    // Helper method to handle both integer and decimal strings
+    private Integer parseChunkIndex(Object value) {
+        if (value == null) return null;
+
+        String strValue = value.toString();
+        try {
+            // Handle decimal strings like "0.0" by converting to double first
+            return (int) Double.parseDouble(strValue);
+        } catch (NumberFormatException e) {
+            log.warn("Failed to parse chunk_index: {}", strValue);
+            return null;
+        }
     }
 }
