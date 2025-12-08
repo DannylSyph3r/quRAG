@@ -10,10 +10,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @OpenAPIDefinition(
 		info = @Info(
 				contact = @Contact(
-						name = "Slethware",
-						email = "dev@slethware.com"
+						name = "Slethware The Dev",
+						email = "slethware@gmail.com"
 				),
-				description = "AI-Powered Document Search & RAG Query Service with Vector Database",
+				description = "Spring AI Document Search & RAG Query Service with Pincone Vector DB",
 				title = "Qurag API Documentation",
 				version = "1.0"
 		)

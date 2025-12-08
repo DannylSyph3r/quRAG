@@ -1,4 +1,4 @@
-package dev.slethware.qurag.service;
+package dev.slethware.qurag.service.document;
 
 import dev.slethware.qurag.dto.response.DocumentDetailResponse;
 import dev.slethware.qurag.dto.response.DocumentResponse;
@@ -6,6 +6,7 @@ import dev.slethware.qurag.entity.Document;
 import dev.slethware.qurag.exception.BadRequestException;
 import dev.slethware.qurag.exception.ResourceNotFoundException;
 import dev.slethware.qurag.repository.DocumentRepository;
+import dev.slethware.qurag.service.S3.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.DocumentReader;
@@ -51,7 +52,7 @@ public class DocumentServiceImpl implements DocumentService {
             // Upload to S3
             String s3Url = s3Service.uploadFile(file, filename);
 
-            // Extract text using Tika
+            // Extract text
             DocumentReader reader = new TikaDocumentReader(new ByteArrayResource(file.getBytes()));
             List<org.springframework.ai.document.Document> documents = reader.get();
 
@@ -81,8 +82,6 @@ public class DocumentServiceImpl implements DocumentService {
                 chunk.getMetadata().put("chunk_index", i);
                 chunk.getMetadata().put("filename", originalFilename);
             }
-
-            log.info("About to store {} chunks in Pinecone vector store", chunks.size());
 
             vectorStore.add(chunks);
 

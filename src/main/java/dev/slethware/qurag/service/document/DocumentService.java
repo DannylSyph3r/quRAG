@@ -1,4 +1,4 @@
-package dev.slethware.qurag.service;
+package dev.slethware.qurag.service.document;
 
 import dev.slethware.qurag.dto.response.DocumentDetailResponse;
 import dev.slethware.qurag.dto.response.DocumentResponse;

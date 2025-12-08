@@ -1,4 +1,4 @@
-package dev.slethware.qurag.service;
+package dev.slethware.qurag.service.RAG;
 
 import dev.slethware.qurag.dto.request.QueryRequest;
 import dev.slethware.qurag.dto.response.ChunkInfo;
@@ -36,14 +36,14 @@ public class RagQueryServiceImpl implements RagQueryService {
 
         List<Document> relevantDocuments = vectorStore.similaritySearch(searchRequest);
 
-        // Build chat client with QuestionAnswerAdvisor
+        // Build chat client
         ChatClient chatClient = chatClientBuilder
                 .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
                         .searchRequest(searchRequest)
                         .build())
                 .build();
 
-        // Get answer from LLM with context
+        // Fetch Answer from LLLM
         String answer = chatClient.prompt()
                 .system("You are a helpful assistant. Provide concise, direct answers. " +
                         "Avoid lengthy lists unless specifically requested. " +
@@ -83,7 +83,7 @@ public class RagQueryServiceImpl implements RagQueryService {
 
         String strValue = value.toString();
         try {
-            // Handle decimal strings like "0.0" by converting to double first
+            // Handle decimal strings like by converting to double first
             return (int) Double.parseDouble(strValue);
         } catch (NumberFormatException e) {
             log.warn("Failed to parse chunk_index: {}", strValue);

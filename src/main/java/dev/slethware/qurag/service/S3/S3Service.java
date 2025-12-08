@@ -1,4 +1,4 @@
-package dev.slethware.qurag.service;
+package dev.slethware.qurag.service.S3;
 
 import org.springframework.web.multipart.MultipartFile;
 
